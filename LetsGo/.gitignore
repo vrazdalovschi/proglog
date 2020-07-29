@@ -20,7 +20,7 @@
 _obj
 _test
 _old*
-.idea/
+../.idea/
 bin/
 
 # Architecture specific extensions/prefixes
