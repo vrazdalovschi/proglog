@@ -32,29 +32,26 @@ func TestLog(t *testing.T) {
 	}
 }
 func testAppendRead(t *testing.T, log *Log) {
-	append := &api.Record{
-		Value: []byte("hello world"),
-	}
-	off, err := log.Append(append)
+	a := &api.Record{Value: []byte("hello world")}
+	off, err := log.Append(a)
 	require.NoError(t, err)
 	require.Equal(t, uint64(0), off)
 	read, err := log.Read(off)
 	require.NoError(t, err)
-	require.Equal(t, append, read)
+	require.Equal(t, a, read)
 }
 
 func testOutOfRangeErr(t *testing.T, log *Log) {
 	read, err := log.Read(1)
 	require.Nil(t, read)
-	require.Error(t, err)
+	apiErr := err.(api.ErrOffsetOutOfRange)
+	require.Equal(t, uint64(1), apiErr.Offset)
 }
 
 func testInitExisting(t *testing.T, o *Log) {
-	append := &api.Record{
-		Value: []byte("hello world"),
-	}
+	a := &api.Record{Value: []byte("hello world")}
 	for i := 0; i < 3; i++ {
-		_, err := o.Append(append)
+		_, err := o.Append(a)
 		require.NoError(t, err)
 	}
 	require.NoError(t, o.Close())
@@ -75,10 +72,8 @@ func testInitExisting(t *testing.T, o *Log) {
 }
 
 func testReader(t *testing.T, log *Log) {
-	append := &api.Record{
-		Value: []byte("hello world"),
-	}
-	off, err := log.Append(append)
+	a := &api.Record{Value: []byte("hello world")}
+	off, err := log.Append(a)
 	require.NoError(t, err)
 	require.Equal(t, uint64(0), off)
 	reader := log.Reader()
@@ -87,15 +82,13 @@ func testReader(t *testing.T, log *Log) {
 	read := &api.Record{}
 	err = proto.Unmarshal(b[lenWidth:], read)
 	require.NoError(t, err)
-	require.Equal(t, append, read)
+	require.Equal(t, a, read)
 }
 
 func testTruncate(t *testing.T, log *Log) {
-	append := &api.Record{
-		Value: []byte("hello world"),
-	}
+	a := &api.Record{Value: []byte("hello world")}
 	for i := 0; i < 3; i++ {
-		_, err := log.Append(append)
+		_, err := log.Append(a)
 		require.NoError(t, err)
 	}
 	err := log.Truncate(1)
