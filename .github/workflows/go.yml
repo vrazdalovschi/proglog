@@ -30,5 +30,8 @@ jobs:
             dep ensure
         fi
 
+    - name: Generate test certs
+        run: make gencert
+
     - name: Test
       run: make test
