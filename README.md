@@ -1,5 +1,5 @@
-![Go](https://github.com/vrazdalovschi/proglog/workflows/Go/badge.svg)
-
+![Go Tests](https://github.com/vrazdalovschi/proglog/workflows/Go/badge.svg)
+![Linter](https://github.com/vrazdalovschi/proglog/workflows/Lint%20Go%20Code/badge.svg)
 # proglog application
 
 ## Commit specification
