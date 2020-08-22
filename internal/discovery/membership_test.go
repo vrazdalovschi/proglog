@@ -71,7 +71,7 @@ func (h *handler) Join(id, addr string) error {
 	}
 	return nil
 }
-func (h *handler) Leave(id, _ string) error {
+func (h *handler) Leave(id string) error {
 	if h.leaves != nil {
 		h.leaves <- id
 	}
