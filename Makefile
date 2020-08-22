@@ -6,7 +6,7 @@ init:
 
 .PHONY: gencert
 gencert:
-	go get -u github.com/cloudflare/cfssl/cmd/...
+	go get github.com/cloudflare/cfssl/cmd/...
 	cfssl gencert \
 		-initca test/ca-csr.json | cfssljson -bare ca
 
