@@ -31,7 +31,9 @@ jobs:
         fi
 
     - name: Generate test certs
-      run: make gencert
+      run: |
+        make init
+        make gencert
 
     - name: Test
       run: make test
