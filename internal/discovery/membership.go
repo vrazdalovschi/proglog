@@ -60,7 +60,7 @@ func (m *Membership) setupSerf() (err error) {
 
 type Handler interface {
 	Join(name, addr string) error
-	Leave(name, addr string) error
+	Leave(name string) error
 }
 
 func (m *Membership) eventHandler() {
@@ -98,7 +98,6 @@ func (m *Membership) handleJoin(member serf.Member) {
 func (m *Membership) handleLeave(member serf.Member) {
 	if err := m.handler.Leave(
 		member.Name,
-		member.Tags["rpc_addr"],
 	); err != nil {
 		log.Printf(
 			"[ERROR] proglog: failed to leave: %s",
