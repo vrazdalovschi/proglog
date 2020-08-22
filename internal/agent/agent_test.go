@@ -9,6 +9,7 @@ import (
 	api "github.com/vrazdalovschi/proglog/api/v1"
 	"github.com/vrazdalovschi/proglog/internal/agent"
 	"github.com/vrazdalovschi/proglog/internal/config"
+	"github.com/vrazdalovschi/proglog/internal/loadbalance"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"io/ioutil"
@@ -83,6 +84,9 @@ func TestAgent(t *testing.T) {
 		},
 	)
 	require.NoError(t, err)
+
+	// wait until replication has finished
+	time.Sleep(3 * time.Second)
 	consumeResponse, err := leaderClient.Consume(
 		context.Background(),
 		&api.ConsumeRequest{
@@ -116,17 +120,14 @@ func TestAgent(t *testing.T) {
 	require.Equal(t, got, want)
 }
 
-func client(
-	t *testing.T,
-	agent *agent.Agent,
-	tlsConfig *tls.Config,
-) api.LogClient {
+func client(t *testing.T, agent *agent.Agent, tlsConfig *tls.Config) api.LogClient {
 	tlsCreds := credentials.NewTLS(tlsConfig)
 	opts := []grpc.DialOption{grpc.WithTransportCredentials(tlsCreds)}
 	rpcAddr, err := agent.Config.RPCAddr()
 	require.NoError(t, err)
 	conn, err := grpc.Dial(fmt.Sprintf(
-		"%s",
+		"%s:///%s",
+		loadbalance.Name,
 		rpcAddr,
 	), opts...)
 	require.NoError(t, err)

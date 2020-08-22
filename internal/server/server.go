@@ -15,8 +15,9 @@ import (
 var _ api.LogServer = (*grpcServer)(nil)
 
 type Config struct {
-	CommitLog  CommitLog
-	Authorizer Authorizer
+	CommitLog   CommitLog
+	Authorizer  Authorizer
+	GetServerer GetServerer
 }
 
 const (
@@ -27,6 +28,9 @@ const (
 
 type Authorizer interface {
 	Authorize(subject, object, action string) error
+}
+type GetServerer interface {
+	GetServers() ([]*api.Server, error)
 }
 
 type CommitLog interface {
@@ -59,6 +63,14 @@ func newGrpcServer(config *Config) (srv *grpcServer, err error) {
 		Config: config,
 	}
 	return srv, nil
+}
+
+func (s *grpcServer) GetServers(_ context.Context, _ *api.GetServersRequest) (*api.GetServersResponse, error) {
+	servers, err := s.GetServerer.GetServers()
+	if err != nil {
+		return nil, err
+	}
+	return &api.GetServersResponse{Servers: servers}, nil
 }
 
 func (s *grpcServer) Produce(ctx context.Context, req *api.ProduceRequest) (*api.ProduceResponse, error) {
